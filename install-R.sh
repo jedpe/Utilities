@@ -25,7 +25,7 @@ cd ~/R
 wget https://curl.se/download/curl-7.77.0.tar.gz
 tar xvzf curl-7.77.0.tar.gz
 cd curl-7.77.0
-./configure --prefix=$HOME/R/libs
+./configure --with-openssl --prefix=$HOME/R/libs
 make
 make install
 cd ~/R
@@ -34,15 +34,16 @@ cd ~/R
 wget https://sourceforge.net/projects/bzip2/files/bzip2-1.0.6.tar.gz
 tar xvzf bzip2-1.0.6.tar.gz
 cd bzip2-1.0.6
+sed -i 's/^CFLAGS=-Wall/CFLAGS=-fPIC -Wall/' Makefile
 make
-make install
+make install PREFIX=$HOME/R/libs
 cd ~/R
 
 # Install pcre2-10.37
 wget https://ftp.pcre.org/pub/pcre/pcre2-10.37.tar.gz
 tar xvzf pcre2-10.37.tar.gz
 cd pcre2-10.37
-./configure --enable-utf8 --prefix=$HOME/R/libs
+./configure --prefix=$HOME/R/libs
 make
 make install
 cd ~/R
@@ -51,7 +52,16 @@ cd ~/R
 wget https://cran.r-project.org/src/base/R-4/R-4.1.0.tar.gz
 tar xvzf R-4.1.0.tar.gz
 cd R-4.1.0
-CPPFLAGS=-I$HOME/R/libs/include LDFLAGS="-L$HOME/R/libs/lib -Wl,-rpath=$HOME/R/libs/lib" ./configure --prefix=$HOME/R/R-4.1.0 --with-cairo --with-blas --with-lapack --enable-R-shlib --with-valgrind-instrumentation=2 --enable-memory-profiling
+./configure CPPFLAGS=-I$HOME/R/libs/include \
+            LDFLAGS="-L$HOME/R/libs/lib -Wl,-rpath=$HOME/R/libs/lib" \
+            PKG_CONFIG_PATH=$HOME/R/libs/lib/pkgconfig \
+            --prefix=$HOME/R/R-4.1.0 \
+            --with-cairo \
+            --with-blas \
+            --with-lapack \
+            --enable-R-shlib \
+            --with-valgrind-instrumentation=2 \
+            --enable-memory-profiling
 make
 make check
 make check-all
