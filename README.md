@@ -1,1 +1,1 @@
-# Some helping scripts
+# Some useful scripts
